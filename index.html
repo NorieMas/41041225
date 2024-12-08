@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>簡易 Blockly Code 網頁</title>
+    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+    <script src="blockly_blocks.js"></script> <!-- 引入自定義的Blockly積木檔案 -->
+    <style>
+        /* 設定Blockly編程區域 */
+        #blocklyDiv {
+            height: 600px;  /* 調整為更高的區域 */
+            width: 800px;   /* 調整為更寬的區域 */
+            border: 1px solid black;
+            margin: 20px auto;
+        }
+        .output {
+            margin-top: 20px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>Blockly 編程範例</h1>
+    
+    <!-- Blockly 編程區域 -->
+    <div id="blocklyDiv"></div>
+
+    <!-- 顯示結果 -->
+    <div id="output" class="output"></div>
+
+    <script>
+        // 創建 Blockly 編輯器
+        var workspace = Blockly.inject('blocklyDiv', {
+            toolbox: `
+                <xml>
+                    <!-- 控制積木 -->
+                    <block type="controls_if"></block>
+                    <block type="controls_repeat_ext"></block>
+                    <block type="math_number"></block>
+                    <block type="text_print"></block>
+                    <block type="variables_get"></block>
+                    <block type="variables_set"></block>
+                    <block type="math_arithmetic"></block>
+                    <block type="logic_compare"></block>
+                    <block type="text"></block>
+                </xml>`
+        });
+
+        // 當點擊按鈕時執行 Blockly 生成的程式碼
+        function executeCode() {
+            var code = Blockly.JavaScript.workspaceToCode(workspace);
+            try {
+                // 用 eval 執行生成的 JavaScript 程式碼
+                eval(code);
+            } catch (e) {
+                document.getElementById('output').innerText = "錯誤：" + e.message;
+            }
+        }
+
+        // 測試區塊生成的代碼
+        function showCode() {
+            var code = Blockly.JavaScript.workspaceToCode(workspace);
+            document.getElementById('output').innerText = code;
+        }
+
+        // 自訂 `console.log` 函數來顯示在頁面中
+        console.log = function(message) {
+            var output = document.getElementById('output');
+            output.innerText += message + "\n";  // 顯示訊息
+        };
+    </script>
+
+    <button onclick="showCode()">顯示生成的程式碼</button>
+    <button onclick="executeCode()">執行程式碼</button>
+</body>
+</html>
