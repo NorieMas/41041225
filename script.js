@@ -65,14 +65,37 @@ document.addEventListener('DOMContentLoaded', function () {
       }
   };
 
-  // 執行 Blockly 程式碼
   window.runBlockly = function () {
-      var code = Blockly.JavaScript.workspaceToCode(workspace);
-      try {
-          var result = eval(code);
-          document.getElementById('output').innerText = '結果: ' + result;
-      } catch (e) {
-          document.getElementById('output').innerText = '錯誤: ' + e.message;
-      }
+    console.log('runBlockly 函數被觸發');
+
+    // 提取 Blockly 工作區生成的程式碼
+    var workspaceCode = Blockly.JavaScript.workspaceToCode(workspace).trim();
+    console.log('工作區程式碼：', workspaceCode);
+
+    // 提取剪貼簿中的程式碼
+    var clipboardContent = document.getElementById('clipboardContent').value.trim();
+    console.log('剪貼簿程式碼：', clipboardContent);
+
+    // 定義轉換函數，將程式碼標準化
+    function normalizeCode(code) {
+        // 將 "print" 替換為 JavaScript 的 "alert"
+        code = code.replace(/print\(["'](.*)["']\)/g, "window.alert('$1');").trim();
+        return code;
+    }
+
+    // 標準化兩段程式碼
+    var normalizedWorkspaceCode = normalizeCode(workspaceCode);
+    var normalizedClipboardCode = normalizeCode(clipboardContent);
+
+    console.log('標準化後的工作區程式碼：', normalizedWorkspaceCode);
+    console.log('標準化後的剪貼簿程式碼：', normalizedClipboardCode);
+
+    // 比較標準化後的程式碼
+    if (normalizedWorkspaceCode === normalizedClipboardCode) {
+        document.getElementById('output').innerText = '驗證成功：程式碼一致！';
+    } else {
+        document.getElementById('output').innerText =
+            `驗證失敗：程式碼不一致。\n標準化後的工作區程式碼：\n${normalizedWorkspaceCode}\n\n標準化後的剪貼簿程式碼：\n${normalizedClipboardCode}`;
+    }
   };
 });
